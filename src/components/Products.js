@@ -9,6 +9,7 @@ export default function Students() {
   const [show, setShow] = useState(false);
   const [editShow, setEditShow] = useState(false);
   const [editAbleData, setEditAbleData] = useState(null);
+  const [isEdit, setIsEdit] = useState(false);
 
   // add student event
   const handleAddStudent = (e) => {
@@ -28,10 +29,14 @@ export default function Students() {
   };
 
   // handle Edit student
-  const handleEdit = ({ name, email, id }) => {
-    // students.map((s) => (s.id === id ? { ...s, name: "rasel" } : s));
+  const handleEdit = (student) => {
+    setIsEdit(true);
+    setEditShow(true);
+    setEditAbleData(student);
+    // console.log(name, email);
+    students.map((s) => (s.id === student.id ? { ...s, name: "rasel" } : s));
   };
-  const handleClose = () => setShow(false);
+  const handleClose = () => (isEdit ? setEditShow(false) : setShow(false));
 
   return (
     <div className="p-5">
@@ -45,17 +50,17 @@ export default function Students() {
           Add Student
         </Button>
         {/* edit modal  here */}
-        <EditModal
+        {/* <EditModal
           data={editAbleData}
           editShow={editShow}
           handleClose={() => setEditShow(false)}
-          handleEdit={() => handleEdit({ name, email })}
-        />
+          // handleEdit={handleEdit({ name, email })}
+        /> */}
 
         {/* Modal for add student */}
-        <Modal show={show} onHide={handleClose}>
+        <Modal show={isEdit ? editShow : show} onHide={handleClose}>
           <Modal.Header closeButton>
-            <Modal.Title>Add Student</Modal.Title>
+            <Modal.Title>{isEdit ? "Edit Student" : "Add Student"}</Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <Form>
@@ -115,10 +120,7 @@ export default function Students() {
                 <td>{student.email}</td>
                 <td>
                   <svg
-                    onClick={() => {
-                      setEditShow(true);
-                      setEditAbleData(student);
-                    }}
+                    onClick={() => handleEdit(student)}
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
                     viewBox="0 0 24 24"

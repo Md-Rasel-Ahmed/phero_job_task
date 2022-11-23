@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Form, Modal } from "react-bootstrap";
 import { Button } from "react-bootstrap";
 
 export default function EditModal({ editShow, handleClose, data, handleEdit }) {
-  const [name, setName] = useState(data?.name || "");
-  const [email, setEmail] = useState(data?.email || "");
+  const [name, setName] = useState(data?.name);
+  const [email, setEmail] = useState(data?.email);
+  useEffect(() => {}, [data]);
   console.log(data);
   return (
     <Modal show={editShow} onHide={handleClose}>
