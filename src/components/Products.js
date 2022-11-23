@@ -6,9 +6,9 @@ export default function Students() {
   const [students, setStudents] = useState([]);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [clickId, setClickId] = useState("");
   const [show, setShow] = useState(false);
   const [editShow, setEditShow] = useState(false);
-  const [editAbleData, setEditAbleData] = useState(null);
   const [isEdit, setIsEdit] = useState(false);
 
   // add student event
@@ -21,6 +21,14 @@ export default function Students() {
     };
     setStudents([...students, student]);
   };
+  // handle Edit Student
+  const handleEditStudent = (e) => {
+    e.preventDefault();
+    const editStudents = students.map((s) =>
+      s.id == clickId ? { ...s, name: name, email: email } : s
+    );
+    setStudents(editStudents);
+  };
 
   // handle delete student
   const handleDelete = (id) => {
@@ -28,15 +36,15 @@ export default function Students() {
     setStudents(remeningStudents);
   };
 
-  // handle Edit student
-  const handleEdit = (student) => {
+  // Edit modal open
+  const editModalOpen = (id) => {
     setIsEdit(true);
     setEditShow(true);
-    setEditAbleData(student);
-    // console.log(name, email);
-    students.map((s) => (s.id === student.id ? { ...s, name: "rasel" } : s));
+    setClickId(id);
   };
-  const handleClose = () => (isEdit ? setEditShow(false) : setShow(false));
+
+  // handle modal closed
+  const handleModalClose = () => (isEdit ? setEditShow(false) : setShow(false));
 
   return (
     <div className="p-5">
@@ -49,16 +57,9 @@ export default function Students() {
         >
           Add Student
         </Button>
-        {/* edit modal  here */}
-        {/* <EditModal
-          data={editAbleData}
-          editShow={editShow}
-          handleClose={() => setEditShow(false)}
-          // handleEdit={handleEdit({ name, email })}
-        /> */}
 
         {/* Modal for add student */}
-        <Modal show={isEdit ? editShow : show} onHide={handleClose}>
+        <Modal show={isEdit ? editShow : show} onHide={handleModalClose}>
           <Modal.Header closeButton>
             <Modal.Title>{isEdit ? "Edit Student" : "Add Student"}</Modal.Title>
           </Modal.Header>
@@ -82,7 +83,7 @@ export default function Students() {
               <Form.Control type="file" className="mb-4" />
 
               <Button
-                onClick={handleAddStudent}
+                onClick={isEdit ? handleEditStudent : handleAddStudent}
                 className="btn btn-primary "
                 type="submit"
               >
@@ -120,7 +121,7 @@ export default function Students() {
                 <td>{student.email}</td>
                 <td>
                   <svg
-                    onClick={() => handleEdit(student)}
+                    onClick={() => editModalOpen(student.id)}
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
                     viewBox="0 0 24 24"
