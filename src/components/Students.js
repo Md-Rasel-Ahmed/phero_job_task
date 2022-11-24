@@ -1,6 +1,7 @@
 import moment from "moment/moment";
 import React, { useEffect, useState } from "react";
 import { Button, Table, Modal, Form } from "react-bootstrap";
+import ImportData from "./ImportData";
 
 export default function Students() {
   const [students, setStudents] = useState([]);
@@ -197,6 +198,7 @@ export default function Students() {
           })}
         </tbody>
       </Table>
+      <ImportData students={students} />
     </div>
   );
 }
