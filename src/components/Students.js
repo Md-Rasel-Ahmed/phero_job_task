@@ -1,33 +1,61 @@
-import React, { useState } from "react";
+import moment from "moment/moment";
+import React, { useEffect, useState } from "react";
 import { Button, Table, Modal, Form } from "react-bootstrap";
-import EditModal from "./EditModal";
 
 export default function Students() {
   const [students, setStudents] = useState([]);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [clickId, setClickId] = useState("");
-  const [show, setShow] = useState(false);
-  const [editShow, setEditShow] = useState(false);
+  const [modalShow, setModalShow] = useState(false);
+  const [editModalShow, setEditModalShow] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
 
-  // add student event
+  useEffect(() => {
+    if (!editModalShow) return setIsEdit(false);
+  }, [editModalShow]);
+
+  const emailValidedReg =
+    /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+
+  // add student event handler
   const handleAddStudent = (e) => {
     e.preventDefault();
-    const student = {
-      name,
-      email,
-      id: Math.random(),
-    };
-    setStudents([...students, student]);
+
+    if (name && email) {
+      if (email.match(emailValidedReg)) {
+        const student = {
+          name,
+          email,
+          id: Math.random(),
+          timestamp: Date.now(),
+        };
+        setStudents([...students, student]);
+        setName("");
+        setEmail("");
+      } else {
+        return alert("Email is not valid");
+      }
+    } else {
+      return alert("Name and email must be provided");
+    }
   };
+
   // handle Edit Student
   const handleEditStudent = (e) => {
     e.preventDefault();
-    const editStudents = students.map((s) =>
-      s.id == clickId ? { ...s, name: name, email: email } : s
-    );
-    setStudents(editStudents);
+    if (name && email) {
+      const editStudents = students.map((s) =>
+        s.id == clickId ? { ...s, name: name, email: email } : s
+      );
+      setStudents(editStudents);
+      setEditModalShow(false);
+      setIsEdit(false);
+      setName("");
+      setEmail("");
+    } else {
+      return alert("Name and email are required");
+    }
   };
 
   // handle delete student
@@ -37,15 +65,17 @@ export default function Students() {
   };
 
   // Edit modal open
-  const editModalOpen = (id) => {
+  const editModalOpen = (student) => {
     setIsEdit(true);
-    setEditShow(true);
-    setClickId(id);
+    setEditModalShow(true);
+    setName(student.name);
+    setEmail(student.email);
+    setClickId(student.id);
   };
 
   // handle modal closed
-  const handleModalClose = () => (isEdit ? setEditShow(false) : setShow(false));
-
+  const handleModalClose = () =>
+    isEdit ? setEditModalShow(false) : setModalShow(false);
   return (
     <div className="p-5">
       <div className="d-flex justify-content-between mb-4">
@@ -53,19 +83,23 @@ export default function Students() {
         <Button
           className="btn-sm"
           variant="primary"
-          onClick={() => setShow(true)}
+          onClick={() => setModalShow(true)}
         >
           Add Student
         </Button>
 
-        {/* Modal for add student */}
-        <Modal show={isEdit ? editShow : show} onHide={handleModalClose}>
+        {/* Modal for add and edit  student */}
+        <Modal
+          show={isEdit ? editModalShow : modalShow}
+          onHide={handleModalClose}
+        >
           <Modal.Header closeButton>
             <Modal.Title>{isEdit ? "Edit Student" : "Add Student"}</Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <Form>
               <Form.Control
+                required
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 type="name"
@@ -73,6 +107,7 @@ export default function Students() {
                 className="mb-4"
               />
               <Form.Control
+                required
                 type="email"
                 onChange={(e) => setEmail(e.target.value)}
                 value={email}
@@ -80,7 +115,7 @@ export default function Students() {
                 className="mb-4"
               />
 
-              <Form.Control type="file" className="mb-4" />
+              <Form.Control name="file" type="file" className="mb-4" />
 
               <Button
                 onClick={isEdit ? handleEditStudent : handleAddStudent}
@@ -92,11 +127,12 @@ export default function Students() {
             </Form>
           </Modal.Body>
         </Modal>
+        {/* modal end */}
       </div>
       <Table striped bordered hover>
         <thead>
           <tr>
-            <th>#</th>
+            <th>Time</th>
             <th>Profile</th>
             <th>Name</th>
             <th>Email</th>
@@ -107,10 +143,12 @@ export default function Students() {
           {students?.map((student) => {
             return (
               <tr key={student.id}>
-                <td>1</td>
+                <td className="text-success">
+                  {moment(student.timestamp).fromNow()}
+                </td>
                 <td>
                   <img
-                    src="https://i.ibb.co/ZKz2k8R/IMG-3729.jpg"
+                    src="https://scontent.fmle1-1.fna.fbcdn.net/v/t39.30808-6/313899730_1184357072156420_256919317010416902_n.jpg?_nc_cat=109&ccb=1-7&_nc_sid=09cbfe&_nc_eui2=AeEXl4dzE0TF69lc9jejtHHfT3IJWTo7BzZPcglZOjsHNkkKi8JmPcVd5IwPip9icGCEFdVAbZwKCdae7gcfqIHg&_nc_ohc=Ne9FDSvviTMAX95jqXT&_nc_ht=scontent.fmle1-1.fna&oh=00_AfDXxi0c-iRyDFf_Sof16kkKbxEuOwld0OOohRCBEOixxw&oe=6383D0DB"
                     width="40"
                     height="40"
                     className="d-inline-block align-top rounded"
@@ -121,7 +159,7 @@ export default function Students() {
                 <td>{student.email}</td>
                 <td>
                   <svg
-                    onClick={() => editModalOpen(student.id)}
+                    onClick={() => editModalOpen(student)}
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
                     viewBox="0 0 24 24"
