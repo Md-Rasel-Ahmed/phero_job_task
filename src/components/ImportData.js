@@ -25,7 +25,7 @@ export default function ImportData({ students }) {
     e.preventDefault();
     let file = e.target.file.files[0];
     if (!file) {
-      return alert("error");
+      return alert("Please provide a valid file");
     }
     let reader = new FileReader();
     reader.onload = (e) => {

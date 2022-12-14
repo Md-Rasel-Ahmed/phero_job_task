@@ -2,7 +2,10 @@ import moment from "moment/moment";
 import React, { useEffect, useState } from "react";
 import { Button, Table, Modal, Form } from "react-bootstrap";
 import ImportData from "./ImportData";
+import Swal from "sweetalert2";
+// import Swal from "sweetalert2/dist/sweetalert2.js";
 
+// import "sweetalert2/src/sweetalert2.scss";
 export default function Students() {
   const [students, setStudents] = useState([]);
   const [name, setName] = useState("");
@@ -35,10 +38,20 @@ export default function Students() {
         setName("");
         setEmail("");
       } else {
-        return alert("Email is not valid");
+        return Swal.fire({
+          title: "Sorry!",
+          text: "Email are not valid",
+          icon: "error",
+          confirmButtonText: "OK",
+        });
       }
     } else {
-      return alert("Name and email must be provided");
+      return Swal.fire({
+        title: "Sorry!",
+        text: "Name and email must be provided",
+        icon: "error",
+        confirmButtonText: "OK",
+      });
     }
   };
 
@@ -61,8 +74,21 @@ export default function Students() {
 
   // handle delete student
   const handleDelete = (id) => {
-    const remeningStudents = students.filter((s) => s.id !== id);
-    setStudents(remeningStudents);
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You want to delete the student!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        Swal.fire("Deleted!", "Student has been deleted.", "success");
+        const remeningStudents = students.filter((s) => s.id !== id);
+        setStudents(remeningStudents);
+      }
+    });
   };
 
   // Edit modal open
